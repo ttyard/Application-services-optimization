@@ -22,7 +22,7 @@ CASSANDRA_HOME=/opt/apache-cassandra-3.10
 CASSANDRA_CONF=$CONFDIR
 PIDFILE=$CASSANDRA_HOME/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
-
+CASSANDRA_JAR=lib/apache-cassandra-3.10.jar
 #Location of JAVA_HOME (bin files)
 export JAVA_HOME=/opt/jdk1.8.0_101
 
@@ -39,7 +39,7 @@ CASSANDRA_USAGE="Usage: $0 {\e[00;32mstart\e[00m|\e[00;31mstop\e[00m|\e[00;31mki
 SHUTDOWN_WAIT=2
 
 cassandra_pid() {   
-    echo `ps -ef | grep $CASSANDRA_HOME | grep -v grep | tr -s " "|cut -d" " -f2`
+    echo `ps -ef | grep $CASSANDRA_HOME | grep -v grep |grep $CASSANDRA_JAR| tr -s " "|cut -d" " -f2`
 }
 
 start() {
@@ -83,7 +83,10 @@ status(){
 terminate() {
 	echo -e "\e[00;31mTerminating Cassandra\e[00m"
 	kill -9 $(cassandra_pid)
-    /bin/su $CASSANDRA_USER -c rm $PIDFILE
+    if [ -f $PIDFILE ]
+    then
+        /bin/su $CASSANDRA_USER -c rm $PIDFILE
+    fi
 }
 
 stop() {
